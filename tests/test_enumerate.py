@@ -2,7 +2,7 @@ import itertools as it
 
 import numpy as np
 import pytest
-from kbest_assignment.admissible_edges import enumerate_kbest
+from kbest_assignment import enumerate_kbest
 
 
 @pytest.mark.parametrize('size', [5,] * 10)
