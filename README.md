@@ -1,6 +1,10 @@
 # assignment-enumeration-python
 
-k-best perfect minimal matching
+Minimum cost k-best perfect matching.
+Assignment problem code is borrowed from [scipy](https://github.com/scipy/scipy), thus affected by their [license](https://github.com/scipy/scipy/blob/master/LICENSE.txt).
+
+
+## Reference
 
 [Chandra R. CHEGIREDDY and Horst W. HAMACHER (1987). *ALGORITHMS FOR FINDING K-BEST PERFECT MATCHINGS*](https://core.ac.uk/download/pdf/82129717.pdf)
 
