@@ -8,13 +8,16 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sparse
 
+from ._types import CostMatrix, MatchingIndices
 from .lsap import calculate_assignment
 
 INFINITY = float("inf")
 
 
-def _reduce_matrix(cost_matrix: np.ndarray) -> Optional[Tuple[float, np.ndarray, np.ndarray]]:
+def _reduce_matrix(cost_matrix: np.ndarray) -> Optional[Tuple[float, MatchingIndices, CostMatrix]]:
     """
+    Reduce matrix so that admissible edges has zero costs
+
     `cost_matrix` should be a square matrix.
 
     Return minimum cost of perfect matchings and admissible edge indices.
@@ -35,7 +38,7 @@ def _reduce_matrix(cost_matrix: np.ndarray) -> Optional[Tuple[float, np.ndarray,
     )
 
 
-def enumerate_kbest(cost_matrix: np.ndarray, *, ignore_same_value: bool) -> Iterator[Tuple[float, np.ndarray, np.ndarray]]:
+def enumerate_kbest(cost_matrix: CostMatrix, *, ignore_same_value: bool) -> Iterator[MatchingIndices]:
     """
     When `ignore_same_value` is set to True, yield only one matching for each cost.
     Otherwise, return all possible matchings, even if some of them has the same value.
@@ -51,11 +54,14 @@ def enumerate_kbest(cost_matrix: np.ndarray, *, ignore_same_value: bool) -> Iter
     # Find first solution
     mincost, a_solution, reduced_cost_matrix = _reduce_matrix(cost_matrix)
 
-    heap = [(mincost, a_solution, reduced_cost_matrix)]
+    # keep track of how many branches we searched
+    # to be able to avoid overlapping value in the heap
+    n_search = 0
+    heap: List[Tuple[float, int, MatchingIndices, CostMatrix]] = [(mincost, n_search, a_solution, reduced_cost_matrix)]
     del mincost, a_solution, reduced_cost_matrix
 
     while heap:
-        parent_cost, a_solution, parent_matrix = heapq.heappop(heap)
+        parent_cost, _, a_solution, parent_matrix = heapq.heappop(heap)
 
         # admissible edges
         rows, cols = np.nonzero(np.isclose(parent_matrix, 0))
@@ -63,6 +69,7 @@ def enumerate_kbest(cost_matrix: np.ndarray, *, ignore_same_value: bool) -> Iter
             yield a_solution
         else:
             raise NotImplementedError()
+            # TODO: implement perfect matching enumeration
             # yield from _enumerate_all_perfect_matchings(rows, cols, a_solution)
 
         # split the solution space into n partitions
@@ -87,4 +94,5 @@ def enumerate_kbest(cost_matrix: np.ndarray, *, ignore_same_value: bool) -> Iter
                 # infeasible cost matrix
                 continue
             child_cost, a_solution, reduced_child_matrix = ret
-            heapq.heappush(heap, (parent_cost + child_cost, a_solution, reduced_child_matrix))
+            n_search += 1
+            heapq.heappush(heap, (parent_cost + child_cost, n_search, a_solution, reduced_child_matrix))
