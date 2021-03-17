@@ -24,6 +24,8 @@ def _reduce_matrix(cost_matrix: np.ndarray) -> Optional[Tuple[float, MatchingInd
     When a perfect matching does not exist, return None
     """
     n = cost_matrix.shape[0]
+    if n == 0:
+        return None
     try:
         _is, _js, _us, _vs = calculate_assignment(cost_matrix)
     except ValueError:
@@ -52,7 +54,11 @@ def enumerate_kbest(cost_matrix: CostMatrix, *, ignore_same_value: bool) -> Iter
     del n_row, n_col
 
     # Find first solution
-    mincost, a_solution, reduced_cost_matrix = _reduce_matrix(cost_matrix)
+    ret = _reduce_matrix(cost_matrix)
+    if ret is None:
+        # infeasible cost matrix
+        raise RuntimeError
+    mincost, a_solution, reduced_cost_matrix = ret
 
     # keep track of how many branches we searched
     # to be able to avoid overlapping value in the heap
