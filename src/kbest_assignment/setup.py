@@ -1,4 +1,6 @@
+"""Setup tool for this module"""
 from numpy.distutils.misc_util import Configuration
+
 
 def configuration(parent_package='', top_path=None):
     config = Configuration('kbest_assignment', parent_package, top_path)

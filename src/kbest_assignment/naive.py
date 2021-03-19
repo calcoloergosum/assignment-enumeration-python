@@ -2,8 +2,7 @@
 Naive approach; find by enumeration of perfect matching
 """
 import heapq
-import itertools as it
-from typing import Callable, Iterator, List, Tuple, Type, TypeVar
+from typing import Callable, Iterator, List, TypeVar
 
 import networkx as nx
 import networkx.algorithms.bipartite as bprt

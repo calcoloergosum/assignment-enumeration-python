@@ -1,12 +1,8 @@
-"""Find admissible edges from cost matrix"""
+"""kbest matching of bipartite graph"""
 import heapq
-import itertools
-import itertools as it
-from typing import Container, Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Iterator, List, Optional, Tuple
 
-import networkx as nx
 import numpy as np
-import scipy.sparse as sparse
 
 from ._types import CostMatrix, MatchingIndices
 from .lsap import calculate_assignment
