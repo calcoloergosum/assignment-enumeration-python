@@ -4,10 +4,14 @@ Naive approach; find by enumeration of perfect matching
 import heapq
 from typing import Callable, Iterator, List, TypeVar
 
-import networkx as nx
-import networkx.algorithms.bipartite as bprt
-
 from ._types import Edge, Matching
+
+try:
+    import networkx as nx
+    import networkx.algorithms.bipartite as bprt
+except ImportError:
+    print("Networkx not found. Regression test is not available")
+
 
 T = TypeVar("T")
 def naive(edges: List[Edge[T]]) -> Iterator[Matching[T]]:

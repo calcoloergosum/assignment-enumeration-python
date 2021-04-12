@@ -431,6 +431,7 @@ def check_setuppy_command():
         try:
             import numpy
             import pybind11
+            import scipy
         except ImportError as exc:  # We do not have our build deps installed
             print(textwrap.dedent(
                     """Error: '%s' must be installed before running the build.
