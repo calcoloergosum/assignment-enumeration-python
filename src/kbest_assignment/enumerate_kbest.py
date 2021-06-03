@@ -1,6 +1,6 @@
 """kbest matching of bipartite graph"""
 import heapq
-from typing import Iterator, List, Optional, Tuple
+from typing import Callable, Iterator, List, Optional, Tuple
 
 import numpy as np
 
@@ -36,14 +36,16 @@ def _reduce_matrix(cost_matrix: np.ndarray) -> Optional[Tuple[float, MatchingInd
     )
 
 
-def enumerate_kbest(cost_matrix: CostMatrix, *, ignore_same_value: bool) -> Iterator[MatchingIndices]:
+def enumerate_kbest(
+    cost_matrix: CostMatrix, *,
+    yield_iter: Optional[Callable[[List[Tuple[int, int]], MatchingIndices], MatchingIndices]] = None
+) -> Iterator[MatchingIndices]:
     """
     When `ignore_same_value` is set to True, yield only one matching for each cost.
     Otherwise, return all possible matchings, even if some of them has the same value.
 
     Iterate through triplets of (matching cost, row indices of a solution, column indices of a solution)
     """
-    assert ignore_same_value, "Enumeration of all perfect matching is currently not supported"
     n_row, n_col = cost_matrix.shape
     assert n_row == n_col
     n = n_row
@@ -67,12 +69,10 @@ def enumerate_kbest(cost_matrix: CostMatrix, *, ignore_same_value: bool) -> Iter
 
         # admissible edges
         rows, cols = np.nonzero(np.isclose(parent_matrix, 0))
-        if ignore_same_value:
+        if yield_iter is None:
             yield a_solution
         else:
-            raise NotImplementedError()
-            # TODO: implement perfect matching enumeration
-            # yield from _enumerate_all_perfect_matchings(rows, cols, a_solution)
+            yield from yield_iter(list(zip(rows, cols)), a_solution)
 
         # split the solution space into n partitions
         for i in range(n):
