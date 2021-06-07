@@ -1,0 +1,54 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.cfg') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo apt-get update
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install pkg-config
+          fi
+          python3 -m pip install --upgrade pip
+          pip3 install -r requirements.txt
+          pip3 install -e .
+          pip3 check
+      - name: Static tests
+        run: |
+          pylint src/kbest_assignment/*.py -d fixme --ignore-patterns version.py,__config__.py
+      - name: Test with pytest
+        run: |
+          pytest tests/ --cov=kbest_assignment -v -x --doctest-modules --cov-config=.coveragerc
+      - name: Build wheel
+        run: |
+          python -m build . --wheel
+      - name: Upload wheel to release
+        if: contains(github.ref, 'tags/v') && matrix.python-version == '3.8'
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*.whl
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
