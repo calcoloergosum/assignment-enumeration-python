@@ -42,7 +42,7 @@ jobs:
           pytest tests/ -v -x
       - name: Build wheel
         run: |
-          python -m build . --wheel
+          python3 -m build . --wheel
       - name: Upload wheel to release
         if: contains(github.ref, 'tags/v') && matrix.python-version == '3.8'
         uses: svenstaro/upload-release-action@v1-release
