@@ -8,7 +8,7 @@ from kbest_assignment import enumerate_kbest
 @pytest.mark.parametrize('size', [5,] * 10)
 def test_linear_sum_assignment(size: int) -> None:
     cost_matrix = np.random.random((size, size))
-    solutions = list(enumerate_kbest(cost_matrix, ignore_same_value=True))
+    solutions = list(enumerate_kbest(cost_matrix, yield_iter=None))
 
     # solution count
     assert len(solutions) == np.math.factorial(size)
