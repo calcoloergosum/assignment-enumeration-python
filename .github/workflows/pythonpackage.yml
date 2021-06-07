@@ -39,7 +39,7 @@ jobs:
           pylint src/kbest_assignment/*.py -d fixme --ignore-patterns version.py,__config__.py
       - name: Test with pytest
         run: |
-          pytest tests/ --cov=kbest_assignment -v -x --doctest-modules --cov-config=.coveragerc
+          pytest tests/ -v -x
       - name: Build wheel
         run: |
           python -m build . --wheel
